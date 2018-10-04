@@ -5,14 +5,13 @@ import * as sim from './simulate.js'
 import * as sp from './path.js' 
 import * as animate from './animate.js'
 
-var grid, svg, towers, path, times, positions, clapEvents, speeds, gold, lumber, towerString
-var goldString, lumberString, timer
 
 game()
 
 function game(){
-
-    svg = d3.select('body')
+    
+    var grid, towers, path, times, gold, lumber, towerString, goldString, lumberString, timer
+    var svg = d3.select('body')
     .append('svg')
     .attrs({width: consts.svgWidth, height: consts.svgHeight});
 
@@ -20,7 +19,6 @@ function game(){
     
         
     if(towerString && goldString && lumberString){
-        console.log(load(towerString, goldString, lumberString))
         var gr, to, go, lu
         [gr, to, go, lu] = load(towerString, goldString, lumberString)
         
@@ -34,8 +32,9 @@ function game(){
         [grid, towers, gold, lumber] = initBack.randomGen();
     }
     
-    front.init(grid, towers, svg, gold, lumber)
-    timer = countdown()
+    timer = countdown(grid, towers, svg, timer)
+    front.init(grid, towers, svg, gold, lumber, timer)
+    
 }
     
 function load(towerString, goldString, lumberString){
@@ -48,12 +47,12 @@ function load(towerString, goldString, lumberString){
     return [gr, to, go, lu]
 }
 
-function getExportLink(to, go, lu){
+function getExportLink(towers, gold, lumber){
     
-    var base = "http://dota2sweden.com/mazing/index.html?";
-    base = base + "t=" + stringRepr(to);
-    base = base + "&g=" + go;
-    base = base + "&l=" + lu;
+    var base = "http://dota2sweden.com/mazing-contest/index.html?";
+    base = base + "t=" + stringRepr(towers);
+    base = base + "&g=" + gold;
+    base = base + "&l=" + lumber;
     return base;
 }
 
@@ -69,24 +68,24 @@ function getArgs(){
 }
 
 
-function countdown(){
+function countdown(grid, towers, svg, timer){
     var count = consts.timer
     var clock = setInterval(function() {
         document.getElementById("displayTime").innerHTML = "Time: " + count--;
         if(count == 0){
             clearInterval(timer);
-            run();
+            run(grid, towers, svg, timer);
         } 
     }, 1000);
     return clock
 }
 
-export function run(){
+export function run(grid, towers, svg, timer){
     
-    console.log(grid)
+    var times, positions, clapEvents, speeds
     front.setResources(0, 0);
     clearInterval(timer);
-    path = sp.shortestPath(grid);
+    var path = sp.shortestPath(grid);
     [times, positions, clapEvents, speeds] = sim.simulate(grid, towers, path)
     animate.animate(svg, times, positions, clapEvents, speeds)
 }
@@ -117,17 +116,17 @@ function gridRepr(gridString){
 
 /*  Return a string representation of the grid
     Use the tower list representation */
-function stringRepr(to){
+function stringRepr(towers){
     
     var str = "";
     for(var i = 0; i < towers.length; i++){
-        str = str + to[i][0] + "," + to[i][1] + "," + to[i][2] + ","
+        str = str + towers[i][0] + "," + towers[i][1] + "," + towers[i][2] + ","
     }
     str = str.substring(0, str.length-1);
     return str
 }
 
-export function copyLink(){
+export function copyLink(towers, gold, lumber){
 
     var value = getExportLink(towers, gold, lumber)
     setClipboard(value)

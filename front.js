@@ -7,7 +7,7 @@ import * as game from './game.js'
 var buildToggle = false;
 var buildType;
 
-export function init(grid, towers, svg, gold, lumber){
+export function init(grid, towers, svg, gold, lumber, timer){
 
     for (var i = 0; i < consts.height; i++){
         for(var j = 0; j < consts.width; j++){
@@ -17,45 +17,59 @@ export function init(grid, towers, svg, gold, lumber){
     
     onHover(svg, grid);
     onClick(grid, towers, svg)
-    createButtons();
+    createButtons(grid, towers,  svg, timer);
     setResources(gold, lumber);
 }
 
 function hasLumber(){
-    var lumber = document.getElementById("displayLumber").innerHTML;
-    lumber = Number(lumber.substring(8))
-    return lumber > 0;
+    return getLumber() > 0 
 }
 
 function hasGold(){
+    return getGold() > 0
+}
+
+function getLumber(){
+    var lumber = document.getElementById("displayLumber").innerHTML;
+    return Number(lumber.substring(8))
+}
+
+function setLumber(value){
+    document.getElementById("displayLumber").innerHTML = "Lumber: " + value;
+}
+
+function getGold(){
     var gold = document.getElementById("displayGold").innerHTML;
-    gold = Number(gold.substring(6))
-    return gold > 0;
+    return Number(gold.substring(6))
+}
+
+function setGold(value){
+    document.getElementById("displayGold").innerHTML = "Gold: " + value;
 }
 
 /* Use value = -1 to decrement */
 function addLumber(value){
-    var lumber = document.getElementById("displayLumber").innerHTML;
-    lumber = Number(lumber.substring(8)) + value;
-    document.getElementById("displayLumber").innerHTML = "Lumber: " + lumber;
+    
+    var lumber = getLumber();
+    setLumber(lumber + value);
 }
 
 /* Use value = -1 to decrement */
 function addGold(value){
-    var gold = document.getElementById("displayGold").innerHTML;
-    gold = Number(gold.substring(6)) + value;
-    console.log(gold)
-    document.getElementById("displayGold").innerHTML = "Gold: " + gold;
+    
+    var gold = getGold();
+    setGold(gold + value);
 }
 
 export function setResources(gold, lumber){
     
-    document.getElementById("displayGold").innerHTML = "Gold: " + gold;
-    document.getElementById("displayLumber").innerHTML = "Lumber: " + lumber;
+    setGold(gold);
+    setLumber(lumber);
 }
 
 function toggleBuild(type){
-
+    
+    console.log(type)
     removeElementsByClass("hoverSquare")
     if(buildToggle){
         if(type == buildType){
@@ -71,7 +85,7 @@ function toggleBuild(type){
     }
 }
 
-function createButtons(){
+function createButtons(grid, towers, svg, timer){
 
     $("#blockTower").button().click(function(){
         toggleBuild(consts.sellableBlockTower);
@@ -81,13 +95,13 @@ function createButtons(){
     }); 
     $("#runButton").button().click(function(){
         removeElementsByClass("hoverSquare")
-        game.run();
+        game.run(grid, towers, svg, timer);
     }); 
     $("#refreshButton").button().click(function(){
         game.refresh();
     }); 
     $("#exportLink").button().click(function(){
-        game.copyLink();
+        game.copyLink(towers, getGold(), getLumber());
     }); 
 }
 
@@ -110,37 +124,37 @@ function onHover(svg, grid){
 
 function handleHover(svg, grid, pix){
     
-    if(buildToggle){
+    
+    if (!buildToggle){
+        return 
+    }
         
-        //Remove any existing hover square
-        removeElementsByClass("hoverSquare")
+    removeElementsByClass("hoverSquare")
 
-        //Make a new one
-        var pos = pixelToGrid(pix)
-        var x = pos[0]
-        var y = pos[1]
-        var scale = scaleFactor()
+    var pos = pixelToGrid(pix)
+    var x = pos[0]
+    var y = pos[1]
+    var scale = scaleFactor()
         
-        var coords = [[x, y], [x+1, y], [x, y+1], [x+1, y+1]];
-        for(var i = 0; i < coords.length; i++){
+    var coords = [[x, y], [x+1, y], [x, y+1], [x+1, y+1]];
+    for(var i = 0; i < coords.length; i++){
         
-            if(coords[i][0] < 0 || coords[i][0] > consts.width-1 || coords[i][1] < 0 
-                || coords[i][1] > consts.height-1){
+        if(coords[i][0] < 0 || coords[i][0] > consts.width-1 || coords[i][1] < 0 
+            || coords[i][1] > consts.height-1){
                 continue
             }
                 
-            if (grid[coords[i][1]][coords[i][0]] == consts.empty){
-                svg.append('rect')
+        if (grid[coords[i][1]][coords[i][0]] == consts.empty){
+            svg.append('rect')
                 .attrs({ x: coords[i][0]*scale, y: coords[i][1]*scale, width: scale, height: scale, 
                     fill: "#99FF44", class: "hoverSquare"})
-            }
-            else{
+        }
+        else{
             svg.append('rect')
                 .attrs({ x: coords[i][0]*scale, y: coords[i][1]*scale, width: scale, height: scale, 
                     fill: "#ff7f50", class: "hoverSquare"})
-            }  
-        }            
-    }
+        }  
+    }            
 }
 
 function removeElementsByClass(className){
@@ -198,10 +212,12 @@ function handleClick(grid, towers, svg, pixPos){
                 //No action can be done
                 break;
             case consts.blockTower:
+                /* Dont allow upgrading blocktowers 
                 if (hasLumber()){
                     var options = ["Options", "Upgrade", "Cancel"];
                     displayRollDown(grid, towers, svg, gridPos, options);
                 }
+                */
                 break;
             case consts.sellableBlockTower:
                 if (hasLumber()){
@@ -220,8 +236,10 @@ function handleClick(grid, towers, svg, pixPos){
                 displayRollDown(grid, towers, svg, gridPos, options);
                 break;
             case consts.upgradedBlockTower:
+                /* Since we're not allowing upgrading blocktower this can never happen
                 var options = ["Options", "Revert upgrade", "Cancel"];
                 displayRollDown(grid, towers, svg, gridPos, options);
+                */
             default:
                 console.log("Invalid squareValue!")   
         }
