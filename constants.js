@@ -52,4 +52,4 @@ export const maxIter = 100000 //Iterations
 export const circleRadius = 10
 
 //Game constants
-export const timer = 60
+export const timer = 45

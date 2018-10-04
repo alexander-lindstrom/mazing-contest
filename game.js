@@ -32,7 +32,7 @@ function game(){
         [grid, towers, gold, lumber] = initBack.randomGen();
     }
     
-    timer = countdown(grid, towers, svg, timer)
+    timer = countdown(grid, towers, svg)
     front.init(grid, towers, svg, gold, lumber, timer)
     
 }
@@ -68,13 +68,13 @@ function getArgs(){
 }
 
 
-function countdown(grid, towers, svg, timer){
+function countdown(grid, towers, svg){
     var count = consts.timer
     var clock = setInterval(function() {
         document.getElementById("displayTime").innerHTML = "Time: " + count--;
         if(count == 0){
-            clearInterval(timer);
-            run(grid, towers, svg, timer);
+            clearInterval(clock);
+            run(grid, towers, svg, clock);
         } 
     }, 1000);
     return clock
@@ -84,6 +84,7 @@ export function run(grid, towers, svg, timer){
     
     var times, positions, clapEvents, speeds
     front.setResources(0, 0);
+    console.log(timer)
     clearInterval(timer);
     var path = sp.shortestPath(grid);
     [times, positions, clapEvents, speeds] = sim.simulate(grid, towers, path)
