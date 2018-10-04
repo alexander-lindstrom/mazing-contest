@@ -1,0 +1,35 @@
+<html>
+    <head>
+    <title>Mazing contest!</title>
+    
+        <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+         rel = "stylesheet">
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+        <script type="module" src="game.js"></script>
+        
+    </head>
+    <body>
+    <div class = "buttons">
+    <input id = "blockTower" type = "submit" value = "Block tower">
+    <input id = "clapTower" type = "submit" value = "Clap tower">
+    <input id = "runButton" type = "submit" value = "Run">
+    <input id = "refreshButton" type = "submit" value = "Refresh">
+    <input id = "exportLink" type = "submit" value = "Shareable link">
+    </div>
+    <div class = "time">
+    <p id="displayTime">Time: 0</p>
+    
+    </div>
+    <div class = "gold">
+    <p id="displayGold">Gold: -</p>
+    </div>
+    <div class = "lumber">
+    <p id="displayLumber">Lumber: -</p>
+    </div>
+    
+    </body>
+</html>
