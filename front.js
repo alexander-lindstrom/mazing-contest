@@ -6,6 +6,7 @@ import * as game from './game.js'
 
 var buildToggle = false;
 var buildType;
+var shift = false;
 
 export function init(grid, towers, svg, gold, lumber, timer){
 
@@ -19,6 +20,45 @@ export function init(grid, towers, svg, gold, lumber, timer){
     onClick(grid, towers, svg)
     createButtons(grid, towers,  svg, timer);
     setResources(gold, lumber);
+    setKeyBoardListeners();
+}
+
+function setKeyBoardListeners(){
+
+    document.addEventListener('keydown', function(event) {
+        switch(event.keyCode){
+        
+            case 16:
+                setShift(true)
+                break;
+            default:       
+        }
+    });
+    
+    document.addEventListener('keyup', function(event) {
+        switch(event.keyCode){
+        
+            case 16:
+                setShift(false)
+                /* Remove hoverSquare if exists */
+                if(document.getElementsByClassName("hoverSquare")){
+                    removeElementsByClass("hoverSquare")
+                }
+                setBuildToggle(false);
+                break;
+            default:       
+        }
+    });
+}
+
+function setBuildToggle(value){
+
+    buildToggle = value;
+}
+
+function setShift(value){
+
+    shift = value;
 }
 
 function hasLumber(){
@@ -69,7 +109,6 @@ export function setResources(gold, lumber){
 
 function toggleBuild(type){
     
-    console.log(type)
     removeElementsByClass("hoverSquare")
     if(buildToggle){
         if(type == buildType){
@@ -180,10 +219,18 @@ function handleClick(grid, towers, svg, pixPos){
             if(hasGold()){
                 buildTower(grid, towers, svg, gridPos, buildType);
             }
+            if(!shift){
+                setBuildToggle(false)
+                removeElementsByClass("hoverSquare")
+            }
         }
         else if (buildType == consts.sellableClapTower){
             if(hasGold() && hasLumber()){
                 buildTower(grid, towers, svg, gridPos, buildType);
+            }
+            if(!shift){
+                setBuildToggle(false)
+                removeElementsByClass("hoverSquare")
             }
         }   
     }
@@ -283,7 +330,6 @@ function displayRollDown(grid, towers, svg, gridPos, options, gold, lumber) {
 function handleSelect(grid, towers, svg, gridPos, gold, lumber){
     
     var value = document.getElementById('select').value;
-    console.log(value)
     switch(value) {
     case "Options":
         //Default value
