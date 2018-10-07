@@ -523,6 +523,7 @@ function canBuild(grid, gridPos){
     var y = gridPos[1];
     
     if (consts.empty == grid[y][x+1] &&
+        consts.empty == grid[y][x+1] &&
         consts.empty == grid[y+1][x] &&
         consts.empty == grid[y+1][x+1]){
         return true

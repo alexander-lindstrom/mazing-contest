@@ -12,8 +12,8 @@ function game(){
     
     var grid, towers, path, times, gold, lumber, towerString, goldString, lumberString, timer
     var svg = d3.select('body')
-    .append('svg')
-    .attrs({width: consts.svgWidth, height: consts.svgHeight});
+        .append('svg')
+        .attrs({width: consts.svgWidth, height: consts.svgHeight});
 
     [towerString, goldString, lumberString] = getArgs();
     
